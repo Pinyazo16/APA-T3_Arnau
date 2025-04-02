@@ -1,6 +1,6 @@
 # Tercera tarea de APA: Multiplicaciones de vectores y ortogonalidad
 
-## Nom i cognoms
+## Nom i cognoms: Arnau Piñero Masegosa
 
 El fichero `algebra/vectores.py` incluye la definición de la clase `Vector` con los
 métodos desarrollados en clase, que incluyen la construcción, representación y
@@ -19,7 +19,6 @@ tests unitarios.
   - La prueba unitaria consistirá en comprobar que, dados `v1 = Vector([1, 2, 3])` y
     `v2 = Vector([4, 5, 6])`, la multiplicación de `v1` por `2` es `Vector([2, 4, 6])`,
     y el producto de Hadamard de `v1` por `v2` es `Vector([4, 10, 18])`.
-
 - Sobrecargue el operador arroba (`@`, multiplicación matricial, correspondiente a los
   métodos `__matmul__()`, `__rmatmul__()`, etc.) para implementar el producto escalar
   de dos vectores.
@@ -40,7 +39,6 @@ $v_2$, y $v_1^\perp$ es normal (perpendicular) a $v_2$.
 
 - Sobrecargue el operador doble barra inclinada (`//`, métodos `__floordiv__()`,
   `__rfloordiv__()`, etc.) para que devuelva la componente tangencial $v_1^\parallel$.
-
 - Sobrecargue el operador tanto por ciento (`%`, métodos `__mod__()`, `__rmod__()`, etc.)
   para que devuelva la componente normal $v_1^\perp$.
 
@@ -63,10 +61,8 @@ $v_2$, y $v_1^\perp$ es normal (perpendicular) a $v_2$.
 
 - El fichero debe incluir una cadena de documentación que incluirá el nombre del alumno
   y los tests unitarios de las funciones incluidas.
-
 - Cada función deberá incluir su propia cadena de documentación que indicará el cometido
   de la función, los argumentos de la misma y la salida proporcionada.
-
 - Se valorará lo pythónico de la solución; en concreto, su claridad y sencillez, y el
   uso de los estándares marcados por PEP-ocho.
 
@@ -81,6 +77,116 @@ resultado de la ejecución de los tests unitarios.
 Inserte a continuación el código de los métodos desarrollados en esta tarea, usando los
 comandos necesarios para que se realice el realce sintáctico en Python del mismo (no
 vale insertar una imagen o una captura de pantalla, debe hacerse en formato *markdown*).
+
+```python
+"""
+    Tercera tarea de APA - manejo de vectores
+
+    Nombre y apellidos: Arnau piñero Masegosa
+
+    Tests unitarios de las funciones desarrolladas:
+
+    >>> v1 = Vector([1, 2, 3])
+    >>> v2 = Vector([4, 5, 6])
+    >>> v1 * v2
+        Vector([4, 10, 18])
+    >>> v1 * 2
+        Vector([2, 4, 6])
+    
+    >>> v1 @ v2
+        32
+    
+    >>> v1 = Vector([2, 1, 2])
+    >>> v2 = Vector([0.5, 1, 0.5])
+    >>> v1 // v2 
+        Vector([1.0, 2.0, 1.0])
+    >>> v1 % v2
+        Vector([1.0, -1.0, 1.0])
+"""
+    
+    def __mul__(self, other):
+        """
+        Producto de Hadamard entre vectores, o producto de un vector por un escalar
+        """
+
+        if isinstance(other, Vector):
+            if len(self.item) != len(other.item):
+                raise ValueError("Los vectores deben tener la misma longitud")
+            return Vector([x * y for x, y in zip(self.item, other.item)])
+        elif isinstance(other, (int, float)):
+            return Vector([x * other for x in self.item])
+        else:
+            raise TypeError("El producto debe ser con un vector o un escalar")
+        
+    def __rmul__(self, other):
+        """
+        Método reflejado del producto por un escalar o de Hadamard
+        """
+
+        return self.__mul__(other)
+    
+    def __matmul__(self, other):
+        """
+        Producto escalar de dos vectores
+        """
+
+        if isinstance(other, Vector):
+            if len(self.item) != len(other.item):
+                raise ValueError("Los vectores deben tener la misma longitud")
+            return sum([x * y for x, y in zip(self.item, other.item)])
+        else:
+            raise TypeError("El producto escalar debe ser con un vector")
+        
+    def __rmatmul__(self, other):
+        """
+        Método reflejado del producto escalar
+        """
+
+        return self.__matmul__(other)
+    
+    def __floordiv__(self, other):
+        """
+        Método que devuelve la componente tangencial (paralela) de un vector respecto a otro
+        """
+        import math
+
+        if isinstance(other, Vector):
+            if len(self.item) != len(other.item):
+                raise ValueError("Los vectores deben tener la misma longitud")
+            prod_escalar = self.__matmul__(other)
+            magnitud = math.sqrt(sum(x ** 2 for x in other.item))
+            return Vector([prod_escalar / magnitud ** 2 * x for x in other.item])
+        else:
+            raise TypeError("La componente tangencial debe ser con un vector")
+
+    def __rfloordiv__(self, other):
+        """
+        Metodo reflejado de la componente tangencial
+        """
+
+        return self.__floordiv__(other)
+    
+    def __mod__(self, other):
+        """
+        Metodo de calculo de la componente normal (perpendicular) de un vector respecto a otro
+        """
+
+        if isinstance(other, Vector):
+            if len(self.item) != len(other.item):
+                raise ValueError("Los vectores deben tener la misma longitud")
+            paralelo = self.__floordiv__(other)
+            normal = [x - y for x, y in zip(self.item, paralelo)]
+            return Vector(normal)
+        else:
+            raise TypeError("La componente normal debe ser con un vector")
+
+    def __rmod__(self, other):
+        """
+        Metodo reflejado de la componente normal
+        """
+        
+        return self.__mod__(other)
+```
 
 #### Subida del resultado al repositorio GitHub y *pull-request*
 
